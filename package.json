@@ -1,0 +1,24 @@
+{
+  "name": "wefox",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Enrique Yepez",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "csrf": "^3.1.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.9.3",
+    "redis": "^3.0.2",
+    "sinon": "^9.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "husky": "^4.2.3",
+    "mocha": "^7.1.0"
+  }
+}
