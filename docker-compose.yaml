@@ -1,0 +1,52 @@
+version: '3.2'
+services:
+  mongo:
+    image: mongo
+    volumes:
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    container_name: wefoxdb
+    hostname: wefox
+    networks:
+      - wefoxnet
+    ports:
+      - 27017:27017 # Port used by mongodb to conecctions from clients.
+  redis:
+    image: redis
+    volumes:
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    container_name: wefoxdb
+    hostname: wefox
+    networks:
+      - wefoxnet
+    ports:
+      - 6379:6379 # Port used by mongodb to conecctions from clients.
+  mproapp:
+    image: wefox/wefox-app:latest
+    container_name: wefox
+    hostname: wefox
+    networks:
+      - wefoxnet
+    environment:
+      - COMMAND=start
+      - DB_HOST=mprodb
+    ports:
+      - "3000:3000"
+  wefoxapp-dev:
+    image: wefox/wefox-app:snapshot
+    volumes:
+      - ../:/home/wefox/src
+    container_name: wefox-dev
+    hostname: wefox
+    networks:
+      - wefoxnet
+    environment:
+      - COMMAND=test
+      - DB_HOST=mprodb
+    ports:
+      - "3000:3000"
+networks:
+  wefoxnet:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.32.6.0/24
