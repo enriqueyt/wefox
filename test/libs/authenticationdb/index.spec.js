@@ -4,7 +4,7 @@ const {Redis} = require('../../../libs/authentiactiondb');
 
 describe('lib authentication db (redis)', () => {
   before('global stub', () => {
-    sinon.stub(Redis, 'init').callsFake(async() => {
+    this.initStub = sinon.stub(Redis, 'init').callsFake(async() => {
       return Promise.resolve({
         Model: {
           _events: [],
@@ -22,6 +22,10 @@ describe('lib authentication db (redis)', () => {
         destroy: async(key) => Promise.resolve(true)
       });
     });
+  });
+
+  after(() => {
+    this.initStub.restore();
   });
 
   describe('functionalities basic of the redis library', () => {

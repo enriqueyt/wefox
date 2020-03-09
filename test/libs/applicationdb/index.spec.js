@@ -17,7 +17,11 @@ describe('lib application db', () => {
       model: [],
       plugins: []
     };
-    sinon.stub(Db.prototype, 'connect').callsFake(async() => Promise.resolve(mockDbConnection));
+    this.connectStub = sinon.stub(Db.prototype, 'connect').callsFake(async() => Promise.resolve(mockDbConnection));
+  });
+
+  after(() => {
+    this.connectStub.restore();
   });
 
   describe('functionalities basic of the db library', () => {
@@ -67,7 +71,7 @@ describe('lib application db', () => {
         country: 'UK',
         __v: 0
       };
-      sinon.stub(Db, 'init').callsFake(async() => {
+      this.initStub = sinon.stub(Db, 'init').callsFake(async() => {
         return Promise.resolve({
           register: (name, model) => {
             return {
@@ -85,6 +89,10 @@ describe('lib application db', () => {
           }
         });
       });
+    });
+
+    after(() => {
+      this.initStub.restore();
     });
 
     it('validate connection to db', async() => {
