@@ -1,0 +1,4 @@
+{
+  "url": "https://maps.googleapis.com/maps/api/geocode/json",
+  "weatherUrl": "http://api.openweathermap.org/data/2.5/weather"
+}
