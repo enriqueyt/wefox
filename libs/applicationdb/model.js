@@ -4,12 +4,13 @@ class ModelDb {
     this.Model = model;
   }
 
-  async findMany(options = {}) {
-    return this.Model.find().lean().exec();
+  async create(document) {
+    const newRegister = new this.Model(document);
+    return this.Model.create(newRegister);
   }
 
-  async find(options = {}) {
-    return this.Model.find(options).lean().exec();
+  async findOne(options = {}) {
+    return this.Model.findOne(options).lean().exec();
   }
 
   async updateOne(id, options) {
@@ -18,10 +19,8 @@ class ModelDb {
     }, options, {upsert: true}).lean().exec();
   }
 
-  async create(document) {
-    const newRegister = new this.Model(document);
-    const result = await this.Model.save(newRegister);
-    return result;
+  async delete(_id) {
+    return this.Model.deleteOne({_id: _id});
   }
 }
 
