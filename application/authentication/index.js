@@ -1,46 +1,32 @@
-const OAuth2Model = require('./model-auth').getInstance();
-const OAuth2Server = require('oauth2-server');
-const Request = OAuth2Server.Request;
-const Response = OAuth2Server.Response;
+const db = require('../../application/db');
+const {AuthModel} = require('./authModel');
 
-class OAuth2 {
-  constructor() {
-    this.oAuth2 = new OAuth2Server({
-      model: OAuth2Model,
-      grants: ['authorization_code', 'refresh_token'],
-      accessTokenLifetime: 60 * 60 * 24, // 24 hours, or 1 day
-      allowEmptyState: true,
-      allowExtendedTokenAttributes: true
-    });
+class Auth {
+  constructor(authModel, modelUser) {
+    this.authModel = authModel;
+    this.modelUser = modelUser;
   }
 
-  static init() {
-    return new OAuth2();
+  static async init() {
+    const model = await AuthModel.init();
+    const dbInstanse = await db();
+    const modelUser = dbInstanse.get('user');
+    return new Auth(model, modelUser);
   }
 
-  getToken(req, res) {
-    const request = new Request(req);
-    const response = new Response(res);
-    return this.oAuth2.token(request, response)
-      .then(function(token) {
-        console.log('token', token);
-        res.json(token);
-      }).catch(function(err) {
-        res.status(err.code || 500).json(err);
-      });
+  async authenticate(username, password, done) {
+    const response = await this.modelUser.findOne({username: username});
+    if (response) {
+      if (response.password !== password) return done(new Error('Wrong credentials'));
+      const token = await this.authModel.saveToken(response);
+      return done(null, token);
+    } else return done(new Error('Wrong User or Password'));
   }
 
-  authenticateRequest(req, res, next) {
-    const request = new Request(req);
-    const response = new Response(res);
-    return this.oAuth2.authenticate(request, response)
-      .then(function(token) {
-        console.log('the request was successfully authenticated');
-        next();
-      }).catch(function(err) {
-        res.status(err.code || 500).json(err);
-      });
+  async validate(token, done) {
+    const data = await this.authModel.getToken(token);
+    return done(null, data);
   }
 }
 
-module.exports.OAuth2 = OAuth2.init();
+module.exports.Auth = Auth;

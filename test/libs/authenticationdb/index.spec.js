@@ -1,8 +1,8 @@
 const expect = require('chai').expect;
 const sinon = require('sinon');
-const {Redis} = require('../../../libs/authentiactiondb');
+const {Redis} = require('../../../libs/authenticationdb');
 
-describe('lib authentication db (redis)', () => {
+describe('library for authentication db (redis)', () => {
   before('global stub', () => {
     this.initStub = sinon.stub(Redis, 'init').callsFake(async() => {
       return Promise.resolve({
