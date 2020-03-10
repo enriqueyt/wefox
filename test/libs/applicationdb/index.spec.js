@@ -3,6 +3,7 @@ const assert = require('assert');
 const sinon = require('sinon');
 const {Db} = require('../../../libs/applicationdb/index');
 const {addressModel} = require('../../../application/address/addressModel');
+const {userModel} = require('../../../application/user/userModal');
 
 describe('lib application db', () => {
   before('global stub', () => {
@@ -48,42 +49,19 @@ describe('lib application db', () => {
     });
   });
 
-  describe('oricess to user the library in the applition', () => {
+  describe('process to user the library in the applitcaion', () => {
     before('instanciate db application', () => {
       this.newRegisterModel = null;
       this.myModel = null;
+      this.customModels = {};
       this._idExpected = '5e659c707c6929c2f95dc86a';
-      const newRecordcors = [{
-        _id: '5e659c707c6929c2f95dc86a',
-        street: 'Fellow court',
-        streetNumber: '4',
-        town: 'Hackney',
-        postalCode: 'E2 8JL',
-        country: 'UK',
-        __v: 0
-      }];
-      const recordUpdated = {
-        _id: '5e659c707c6929c2f95dc86a',
-        street: 'Fellow court',
-        streetNumber: '7',
-        town: 'Hackney Park',
-        postalCode: 'E2 8JL',
-        country: 'UK',
-        __v: 0
-      };
       this.initStub = sinon.stub(Db, 'init').callsFake(async() => {
         return Promise.resolve({
           register: (name, model) => {
+            this.customModels[name] = model;
             return {
               get: (modelName) => {
-                return {
-                  create: (recordToSave) => Promise.resolve(newRecordcors.find(record =>
-                    record.street === recordToSave.street &&
-                    record.postalCode === recordToSave.postalCode)),
-                  findOne: (option) => Promise.resolve(newRecordcors.find(record => record._id === option._id)),
-                  updateOne: () => Promise.resolve(recordUpdated),
-                  delete: (_id) => Promise.resolve({n: 1, ok: 1, deletedCount: 1})
-                };
+                return this.customModels[modelName];
               }
             };
           }
@@ -108,47 +86,20 @@ describe('lib application db', () => {
       expect(this.newInstanseDb).to.have.any.keys('customModels', 'register');
     });
 
-    it('register and get a model', () => {
-      this.newRegisterModel = this.newInstanseDb.register('address', addressModel);
-      this.myModel = this.newRegisterModel.get('address');
+    it('register and get a address model', () => {
+      const newRegisterModel = this.newInstanseDb.register('address', addressModel);
+      const myModel = newRegisterModel.get('address');
 
-      expect(this.newRegisterModel).not.to.be.an('undefined');
-      expect(this.myModel).not.to.be.an('undefined');
+      expect(newRegisterModel).not.to.be.an('undefined');
+      expect(myModel).not.to.be.an('undefined');
     });
 
-    it('new address has to be inserted', async() => {
-      const address = {
-        street: 'Fellow court',
-        streetNumber: 4,
-        town: 'Hackney',
-        postalCode: 'E2 8JL',
-        country: 'UK'
-      };
-      const newAdreess = await this.myModel.create(address);
+    it('register and get a User model', () => {
+      const newRegisterUserModel = this.newInstanseDb.register('user', userModel);
+      const myUserModel = newRegisterUserModel.get('user');
 
-      expect(typeof newAdreess).to.be.equal('object');
-      expect(newAdreess._id).to.be.equal(this._idExpected);
-    });
-
-    it('should find element already created', async() => {
-      const element = await this.myModel.findOne({_id: this._idExpected});
-      expect(element.street).to.be.equals('Fellow court');
-      expect(element).to.have.any.keys('_id', '__v');
-    });
-
-    it('should update element', async() => {
-      const options = {streetNumber: '7', town: 'Hackney Park'};
-      const elementUpdate = await this.myModel.updateOne(this._idExpected, options);
-      expect(elementUpdate.streetNumber).to.be.equal(options.streetNumber);
-      expect(elementUpdate.town).to.be.equal(options.town);
-    });
-
-    it('should delete element', async() => {
-      const deleteUpdate = await this.myModel.delete(this._idExpected);
-      expect(deleteUpdate).to.have.keys('n', 'ok', 'deletedCount');
-      expect(deleteUpdate.n).to.be.equal(1);
-      expect(deleteUpdate.ok).to.be.equal(1);
-      expect(deleteUpdate.deletedCount).to.be.equal(1);
+      expect(newRegisterUserModel).not.to.be.an('undefined');
+      expect(myUserModel).not.to.be.an('undefined');
     });
   });
 });
