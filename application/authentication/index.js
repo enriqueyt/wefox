@@ -1,5 +1,5 @@
-const db = require('../../application/db');
 const {AuthModel} = require('./authModel');
+const {User} = require('../user');
 
 class Auth {
   constructor(authModel, modelUser) {
@@ -9,18 +9,18 @@ class Auth {
 
   static async init() {
     const model = await AuthModel.init();
-    const dbInstanse = await db();
-    const modelUser = dbInstanse.get('user');
+    const modelUser = await User.init();
     return new Auth(model, modelUser);
   }
 
   async authenticate(username, password, done) {
-    const response = await this.modelUser.findOne({username: username});
+    const response = await this.modelUser.validateUser(username, password);
     if (response) {
-      if (response.password !== password) return done(new Error('Wrong credentials'));
       const token = await this.authModel.saveToken(response);
       return done(null, token);
-    } else return done(new Error('Wrong User or Password'));
+    } else {
+      return done(new Error('Wrong User or Password'));
+    }
   }
 
   async validate(token, done) {

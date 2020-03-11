@@ -1,73 +1,66 @@
 const expect = require('chai').expect;
-const sinon = require('sinon');
-const {Db} = require('../../../libs/applicationdb/index');
-const {addressModel} = require('../../../application/address/addressModel');
+const assert = require('chai').assert;
+const request = require('supertest');
+const {Address} = require('../../../application/address');
+const {server} = require('../server-setup');
+
+const authenticatedUser = request.agent(server);
 
 describe('Handler CRUD for address db modelapplication db', () => {
   before('global stub', () => {
-    this.newInstanseDb = null;
-    const mockDbConnection = {
-      connections: [],
-      _pluralize: {},
-      models: {},
-      modelSchemas: {},
-      options: {},
-      Schema: {},
-      model: [],
-      plugins: []
+    const weatherStub = {
+      coord: {
+        lon: -0.13,
+        lat: 51.51
+      },
+      weather: [
+        {
+          id: 803,
+          main: 'Clouds',
+          description: 'broken clouds',
+          icon: '04d'
+        }
+      ],
+      base: 'stations',
+      main: {
+        temp: 285.45,
+        feels_like: 281.93,
+        temp_min: 284.15,
+        temp_max: 286.48,
+        pressure: 1011,
+        humidity: 71
+      },
+      visibility: 10000,
+      wind: {
+        speed: 4.1,
+        deg: 240
+      },
+      clouds: {
+        all: 75
+      },
+      dt: 1583926891,
+      sys: {
+        type: 1,
+        id: 1414,
+        country: 'GB',
+        sunrise: 1583907779,
+        sunset: 1583949486
+      },
+      timezone: 0,
+      id: 2643743,
+      name: 'London',
+      cod: 200
     };
-    this.connectStub = sinon.stub(Db.prototype, 'connect').callsFake(async() => Promise.resolve(mockDbConnection));
+    console.log(weatherStub);
   });
 
   after(() => {
-    this.connectStub.restore();
+
   });
 
-  describe('process to user the library in the application', () => {
+  describe.skip('process to user the library in the application', () => {
     before('instanciate db application', async() => {
-      this.newRegisterModel = null;
-      this.myModel = null;
-      this._idExpected = '5e659c707c6929c2f95dc86a';
-      const newRecordcors = [{
-        _id: '5e659c707c6929c2f95dc86a',
-        street: 'Fellow court',
-        streetNumber: '4',
-        town: 'Hackney',
-        postalCode: 'E2 8JL',
-        country: 'UK',
-        __v: 0
-      }];
-      const recordUpdated = {
-        _id: '5e659c707c6929c2f95dc86a',
-        street: 'Fellow court',
-        streetNumber: '7',
-        town: 'Hackney Park',
-        postalCode: 'E2 8JL',
-        country: 'UK',
-        __v: 0
-      };
-      this.initStub = sinon.stub(Db, 'init').callsFake(async() => {
-        return Promise.resolve({
-          register: (name, model) => {
-            return {
-              get: (modelName) => {
-                return {
-                  create: (recordToSave) => Promise.resolve(newRecordcors.find(record =>
-                    record.street === recordToSave.street &&
-                    record.postalCode === recordToSave.postalCode)),
-                  findOne: (option) => Promise.resolve(newRecordcors.find(record => record._id === option._id)),
-                  updateOne: () => Promise.resolve(recordUpdated),
-                  delete: (_id) => Promise.resolve({n: 1, ok: 1, deletedCount: 1})
-                };
-              }
-            };
-          }
-        });
-      });
 
-      this.newInstanseDb = await Db.init();
-      this.newRegisterModel = this.newInstanseDb.register('address', addressModel);
-      this.myModel = this.newRegisterModel.get('address');
     });
 
     after(() => {
@@ -75,38 +68,215 @@ describe('Handler CRUD for address db modelapplication db', () => {
     });
 
     it('new address has to be inserted', async() => {
-      const address = {
-        street: 'Fellow court',
-        streetNumber: 4,
-        town: 'Hackney',
-        postalCode: 'E2 8JL',
-        country: 'UK'
+      const aux = {
+        addressComponents: [
+          {
+            long_name: 'Fellows Court',
+            short_name: 'Fellows Ct',
+            types: [
+              'route'
+            ]
+          },
+          {
+            long_name: 'London',
+            short_name: 'London',
+            types: [
+              'postal_town'
+            ]
+          },
+          {
+            long_name: 'Greater London',
+            short_name: 'Greater London',
+            types: [
+              'administrative_area_level_2',
+              'political'
+            ]
+          },
+          {
+            long_name: 'England',
+            short_name: 'England',
+            types: [
+              'administrative_area_level_1',
+              'political'
+            ]
+          },
+          {
+            long_name: 'United Kingdom',
+            short_name: 'GB',
+            types: [
+              'country',
+              'political'
+            ]
+          },
+          {
+            long_name: 'E2',
+            short_name: 'E2',
+            types: [
+              'postal_code',
+              'postal_code_prefix'
+            ]
+          }
+        ],
+        geometry: [
+          {
+            bounds: {
+              northeast: {
+                lat: 51.5317622,
+                lng: -0.0735943
+              },
+              southwest: {
+                lat: 51.5305703,
+                lng: -0.0748813
+              }
+            },
+            location: {
+              lat: 51.5314304,
+              lng: -0.0742366
+            },
+            location_type: 'GEOMETRIC_CENTER',
+            viewport: {
+              northeast: {
+                lat: 51.5325152302915,
+                lng: -0.07288881970849798
+              },
+              southwest: {
+                lat: 51.5298172697085,
+                lng: -0.07558678029150204
+              }
+            }
+          }
+        ],
+        _id: '5e68d6ba1bfa9f2fde0c38e4',
+        street: 'Fellows Ct',
+        formattedAddress: 'Fellows Ct, London E2, UK',
+        streetNumber: '',
+        town: 'London',
+        postalCode: 'E2',
+        country: ' UK',
+        placeId: 'ChIJ9y41Ib8cdkgR1TX1odBwHMk',
+        expire: 1583972218,
+        __v: 0,
+        weather: {
+          coord: {
+            lon: -0.13,
+            lat: 51.51
+          },
+          weather: [
+            {
+              id: 803,
+              main: 'Clouds',
+              description: 'broken clouds',
+              icon: '04d'
+            }
+          ],
+          base: 'stations',
+          main: {
+            temp: 286.16,
+            feels_like: 280.53,
+            temp_min: 284.82,
+            temp_max: 287.59,
+            pressure: 1011,
+            humidity: 62
+          },
+          visibility: 10000,
+          wind: {
+            speed: 6.7,
+            deg: 230
+          },
+          clouds: {
+            all: 75
+          },
+          dt: 1583928610,
+          sys: {
+            type: 1,
+            id: 1414,
+            country: 'GB',
+            sunrise: 1583907779,
+            sunset: 1583949486
+          },
+          timezone: 0,
+          id: 2643743,
+          name: 'London',
+          cod: 200
+        }
       };
-      const newAdreess = await this.myModel.create(address);
+      console.log(aux);
+      const req = {
+        body: {
+          address: 'Fellows Ct',
+          country: 'uk',
+          town: 'london',
+          postalCode: 'E2',
+          streetNumber: 'Fellows'
+        }
+      };
+      const newAdreess = await Address.validateAddressWeather(req);
 
       expect(typeof newAdreess).to.be.equal('object');
       expect(newAdreess._id).to.be.equal(this._idExpected);
     });
+  });
 
-    it('should find element already created', async() => {
-      const element = await this.myModel.findOne({_id: this._idExpected});
-      expect(element.street).to.be.equals('Fellow court');
-      expect(element).to.have.any.keys('_id', '__v');
+  describe('/api/address/validate', () => {
+    const req = {
+      body: {
+        address: 'Fellows Ct',
+        country: 'uk',
+        town: 'london',
+        postalCode: 'E2',
+        streetNumber: 'Fellows'
+      }
+    };
+
+    it('should validate and address given', () => {
+      authenticatedUser
+        .get('/api/address/validate')
+        .send(req)
+        .set({
+          Authorization: 'Bearer xf8rvp57YnAwr7LHE1lI6eB9845M2yuvaGVby2AyXkYcaAB4pHawHVD8mx7HlgTT9AVQoSUTasxfq0' +
+            'M8pkGsfBo97pvBmWG6EqPieVkQhCRnr3ih50CZLI1PxV1jHo3nrRI1SYc4bd4kodxYx4HwVbMwAS6cluyvn1Zc1LUceW8E9lnfE7GFV' +
+            'jzvP14a7jqcojBDET8NvAWpGAy9x2uYO51GHcnLSwEUUP2OGuun5ae34qWoEtvQrpxAkY2VnPQB'
+        })
+        .end((err, response) => {
+          if (err) {
+            assert.fail(err);
+          }
+          expect(response.statusCode).to.equal(200);
+        });
     });
 
-    it('should update element', async() => {
-      const options = {streetNumber: '7', town: 'Hackney Park'};
-      const elementUpdate = await this.myModel.updateOne(this._idExpected, options);
-      expect(elementUpdate.streetNumber).to.be.equal(options.streetNumber);
-      expect(elementUpdate.town).to.be.equal(options.town);
+    it('should retrieve infor for the weather', () => {
+      authenticatedUser
+        .get('/api/weather')
+        .send(req)
+        .set({
+          Authorization: 'Bearer xf8rvp57YnAwr7LHE1lI6eB9845M2yuvaGVby2AyXkYcaAB4pHawHVD8mx7HlgTT9AVQoSUTasxfq0' +
+            'M8pkGsfBo97pvBmWG6EqPieVkQhCRnr3ih50CZLI1PxV1jHo3nrRI1SYc4bd4kodxYx4HwVbMwAS6cluyvn1Zc1LUceW8E9lnfE7GFV' +
+            'jzvP14a7jqcojBDET8NvAWpGAy9x2uYO51GHcnLSwEUUP2OGuun5ae34qWoEtvQrpxAkY2VnPQB'
+        })
+        .end((err, response) => {
+          if (err) {
+            assert.fail(err);
+          }
+          expect(response.statusCode).to.equal(200);
+        });
     });
 
-    it('should delete element', async() => {
-      const deleteUpdate = await this.myModel.delete(this._idExpected);
-      expect(deleteUpdate).to.have.keys('n', 'ok', 'deletedCount');
-      expect(deleteUpdate.n).to.be.equal(1);
-      expect(deleteUpdate.ok).to.be.equal(1);
-      expect(deleteUpdate.deletedCount).to.be.equal(1);
+    it.only('should retrieve info the address and the weather', () => {
+      authenticatedUser
+        .get('/api/address')
+        .send(req.body)
+        .set({
+          Authorization: 'Bearer xf8rvp57YnAwr7LHE1lI6eB9845M2yuvaGVby2AyXkYcaAB4pHawHVD8mx7HlgTT9AVQoSUTasxfq0' +
+            'M8pkGsfBo97pvBmWG6EqPieVkQhCRnr3ih50CZLI1PxV1jHo3nrRI1SYc4bd4kodxYx4HwVbMwAS6cluyvn1Zc1LUceW8E9lnfE7GFV' +
+            'jzvP14a7jqcojBDET8NvAWpGAy9x2uYO51GHcnLSwEUUP2OGuun5ae34qWoEtvQrpxAkY2VnPQB'
+        })
+        .end((err, response) => {
+          if (err) {
+            assert.fail(err);
+          }
+          expect(response.statusCode).to.equal(200);
+        });
     });
   });
 });

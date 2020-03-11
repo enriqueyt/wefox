@@ -8,6 +8,7 @@ const passport = require('passport');
 require('../libs/passport-config');
 
 const router = require('./router');
+const addressRouter = require('./address/router');
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.use((req, res, next) => {
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 app.use(router);
+app.use(addressRouter);
 
 if (require.main === module) {
   app.listen(config.port, () => {
