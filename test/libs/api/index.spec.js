@@ -156,7 +156,9 @@ describe('lib authentication db (redis)', () => {
     it('should make request to Geocoding asking with address and country', async() => {
       const response = await this.newRegisterModel.request({
         address: '221 Fellows Ct',
-        components: 'country:uk'
+        components: {
+          country: 'uk'
+        }
       });
       expect(response).to.have.keys('status', 'statusText', 'data', 'config', 'headers', 'request');
       expect(response.status).to.be.equal(200);

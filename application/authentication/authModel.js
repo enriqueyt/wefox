@@ -1,5 +1,6 @@
 const {Redis} = require('../../libs/authenticationdb');
 const crypto = require('crypto');
+const moment = require('moment');
 
 class AuthModel {
   constructor(redisInstance) {
@@ -16,21 +17,27 @@ class AuthModel {
     if (!strToken) {
       return new Error('Need login');
     }
-    const token = JSON.parse(strToken);
+    const {accessToken, accessTokenExpiresAt} = JSON.parse(strToken);
+
+    if (this.isTokenExpire(accessTokenExpiresAt)) {
+      return new Error('Please login again');
+    }
     return {
-      accessToken: token.accessToken,
-      accessTokenExpiresAt: token.accessTokenExpiresAt,
-      refreshToken: token.refreshToken,
-      refreshTokenExpiresAt: token.refreshTokenExpiresAt
+      accessToken,
+      accessTokenExpiresAt
     };
   }
 
+  isTokenExpire(accessTokenExpiresAt) {
+    return accessTokenExpiresAt > moment().utc().unix();
+  }
+
   async saveToken(user) {
+    const expires = moment().utc().add({hours: 10}).unix();
+
     const data = {
       accessToken: this.generateAuthorizationCode(),
-      accessTokenExpiresAt: new Date(60 * 60 * 24),
-      refreshToken: false,
-      refreshTokenExpiresAt: 60 * 60 * 24,
+      accessTokenExpiresAt: expires,
       user: {
         id: user._id
       }

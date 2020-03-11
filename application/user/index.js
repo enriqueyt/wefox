@@ -1,40 +1,69 @@
-const {db} = require('../index');
+const bcrypt = require('bcrypt');
+const db = require('../db');
 
 class User {
-  constructor() {
-    this.model = db.get('user');
+  constructor(dbInstanse) {
+    this.model = dbInstanse.get('user');
   }
 
-  static init() {
-    return new User();
+  static async init() {
+    const dbInstanse = await db();
+    return new User(dbInstanse);
   }
 
-  async addUser(req, res) {
-    const userModel = this.getAccountModel(req.body);
-    const newUser = await this.model.create(userModel);
-    res.json(newUser);
+  async createUser(req, res) {
+    const newPassword = await this.encryptPassword(req.body.password);
+    const document = Object.assign({}, req.body, {password: newPassword});
+    const userModel = this.mapUserModel(document);
+    return this.model.create(userModel);
   }
 
-  async getUser(req, res) {
-    const {id} = req.params.id;
-    const currentAccount = await this.model.findOne({_id: id});
-    res.json(currentAccount);
+  async findUserById(req, res) {
+    return this.model.findOne({_id: req.body.id});
+  }
+
+  async findUserByUsername(username) {
+    return this.model.findOne({username: username});
   }
 
   async editAccount(req, res) {
     const {currentDocument, propertiesToUpdated} = req.body;
     const userToUpdate = this.mapUserModel(currentDocument, propertiesToUpdated);
-    const userUpdate = await this.model.updateOne(userToUpdate);
-    res.json(userUpdate);
+    return this.model.updateOne(userToUpdate);
+  }
+
+  async encryptPassword(password) {
+    return bcrypt.hashSync(password, 10);
+  }
+
+  async comparePassword(password, passwordHash) {
+    return bcrypt.compare(password, passwordHash);
+  }
+
+  async validateUser(username, password) {
+    const response = await this.findUserByUsername(username);
+    const isMatchPassword = await this.comparePassword(password, response.password);
+    if (!isMatchPassword) {
+      return null;
+    }
+
+    const {name, email, postalCode, country} = response;
+
+    return {
+      name,
+      username,
+      email,
+      postalCode,
+      country
+    };
   }
 
   mapUserModel(currentDocument, updatedProperties = {}) {
-    const {name, username, type, password, email, postalCode, country} = currentDocument;
+    const {name, username, password, email, postalCode, country} = currentDocument;
 
     return Object.assign({}, {
       name: name,
       username: username,
-      type: type,
       password: password,
       email: email,
       postalCode: postalCode,
@@ -43,4 +72,4 @@ class User {
   }
 }
 
-module.exports = User.init();
+module.exports.User = User;
