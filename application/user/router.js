@@ -13,8 +13,8 @@ router.get('/api/singin', async(req, res, next) => {
     notification: req.notification
   };
 
-  const aux = await myUser.createUser(user);
-  res.status(200).send(aux);
+  const newUser = await myUser.createUser(user);
+  res.status(200).send(newUser);
 });
 
 module.exports = router;

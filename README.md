@@ -25,13 +25,96 @@ nvm install --lts
 
 ## Development
 
-### To start the Node.js server: 
-``` bash
+**note**: you have to create an .env file and set up key for geocoding and open wheather
+
+```
+$ vi .env
+GEOCODING_API=YOUR_API_KEY
+WEATHER_API=YOUR_API_KEY
 
 ```
 
-### To preview the app on web browser
+### To start the Node.js server:
+``` bash
+    npm start
+```
 
+### steps to reproduce app
+
+#### Create previous credentials
+
+```
+POST http://127.0.0.1:3000/api/singin
+
+data
+
+{
+  "name": "Enrique yepez four",
+  "username": "enriqueyt5",
+  "password": "password123",
+  "email": "enrique@gmail.com",
+  "postalCode": "E2",
+  "country": "UK",
+  "notification": true
+}
+
+```
+
+### Login in the app
+
+```
+ POST http://localhost:3000/api/login
+
+data
+
+{
+  "username": "enriqueyt5",
+  "password": "password123"
+}
+
+```
+
+### Validate address
+
+```
+POST http://localhost:3000/api/address
+--header Authorization: Bearer c11bb2f946645e22a2f0c171fee43ddd77067901
+
+data
+
+{
+	"address": "Fellows Ct",
+    "country": "uk",
+    "town": "london",
+    "postalCode": "E2",
+    "streetNumber": "Fellows"
+
+}
+```
+
+### Validate weather
+
+```
+POST http://localhost:3000/api/weather
+--header Authorization: Bearer c11bb2f946645e22a2f0c171fee43ddd77067901
+
+data
+
+{
+	"address": "Fellows Ct",
+    "country": "uk",
+    "town": "london",
+    "postalCode": "E2",
+    "streetNumber": "Fellows"
+
+}
+```
+
+## Reproduce test
+
+```
+$ npm run test
+```
 
 ## Deploying to Heroku
 
