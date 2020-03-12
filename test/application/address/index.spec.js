@@ -6,7 +6,7 @@ const {server} = require('../server-setup');
 
 const authenticatedUser = request.agent(server);
 
-describe.skip('Handler CRUD for address db modelapplication db', () => {
+describe('Handler CRUD for address db modelapplication db', () => {
   before('global stub', () => {
     const weatherStub = {
       coord: {
@@ -58,7 +58,7 @@ describe.skip('Handler CRUD for address db modelapplication db', () => {
 
   });
 
-  describe('process to user the library in the application', () => {
+  describe.skip('process to user the library in the application', () => {
     before('instanciate db application', async() => {
 
     });
@@ -217,7 +217,7 @@ describe.skip('Handler CRUD for address db modelapplication db', () => {
     });
   });
 
-  describe('/api/address/validate', () => {
+  describe.skip('/api/address/validate', () => {
     const req = {
       body: {
         address: 'Fellows Ct',
@@ -228,7 +228,7 @@ describe.skip('Handler CRUD for address db modelapplication db', () => {
       }
     };
 
-    it('should validate and address given', () => {
+    it.skip('should validate and address given', () => {
       authenticatedUser
         .get('/api/address/validate')
         .send(req)
@@ -245,7 +245,7 @@ describe.skip('Handler CRUD for address db modelapplication db', () => {
         });
     });
 
-    it('should retrieve infor for the weather', () => {
+    it.skip('should retrieve infor for the weather', () => {
       authenticatedUser
         .get('/api/weather')
         .send(req)
@@ -262,7 +262,7 @@ describe.skip('Handler CRUD for address db modelapplication db', () => {
         });
     });
 
-    it.only('should retrieve info the address and the weather', () => {
+    it.skip('should retrieve info the address and the weather', () => {
       authenticatedUser
         .get('/api/address')
         .send(req.body)
