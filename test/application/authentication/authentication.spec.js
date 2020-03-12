@@ -11,8 +11,8 @@ const userCredentials = {
 
 const authenticatedUser = request.agent(server);
 
-describe.skip('/oauth', () => {
-  it('should login new user to the add', () => {
+describe('/oauth', () => {
+  it.skip('should login new user to the add', () => {
     authenticatedUser
       .get('/api/auth')
       .send(userCredentials)
