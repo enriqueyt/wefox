@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node application/",
+    "start": "npm run notifications:start; node application/",
+    "stop": "npm run notifications:stop",
+    "notifications:start": "bash scripts/notifications.sh start > /dev/null 2>/dev/null &",
+    "notifications:stop": "bash scripts/notifications.sh stop > /dev/null 2>/dev/null &",
     "lint": "node_modules/.bin/eslint .",
     "test": "mocha $NODE_DEBUG_OPTION test/**/*.spec.js"
   },
@@ -29,6 +32,7 @@
     "express-session": "^1.17.0",
     "moment": "^2.24.0",
     "mongoose": "^5.9.3",
+    "nodemailer": "^6.4.5",
     "oauth2-server": "^3.0.1",
     "passport": "^0.4.1",
     "passport-http-bearer": "^1.0.1",

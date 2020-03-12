@@ -17,19 +17,21 @@ class AuthModel {
     if (!strToken) {
       return new Error('Need login');
     }
-    const {accessToken, accessTokenExpiresAt} = JSON.parse(strToken);
+    const {accessToken, accessTokenExpiresAt, user} = JSON.parse(strToken);
 
     if (this.isTokenExpire(accessTokenExpiresAt)) {
       return new Error('Please login again');
     }
     return {
       accessToken,
-      accessTokenExpiresAt
+      accessTokenExpiresAt,
+      notification: user.notification,
+      id: user.id
     };
   }
 
   isTokenExpire(accessTokenExpiresAt) {
-    return accessTokenExpiresAt > moment().utc().unix();
+    return accessTokenExpiresAt < moment().utc().unix();
   }
 
   async saveToken(user) {
@@ -39,14 +41,17 @@ class AuthModel {
       accessToken: this.generateAuthorizationCode(),
       accessTokenExpiresAt: expires,
       user: {
-        id: user._id
+        id: user._id,
+        notification: user.notification
       }
     };
 
-    return this.redisInstance.set(data.accessToken, JSON.stringify(data));
+    const result = this.redisInstance.set(data.accessToken, JSON.stringify(data));
+    if (result) return data.accessToken;
+    throw new Error('Error save credentials');
   }
 
-  async generateAuthorizationCode() {
+  generateAuthorizationCode() {
     const seed = crypto.randomBytes(256);
     const code = crypto
       .createHash('sha1')

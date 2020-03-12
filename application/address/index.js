@@ -49,7 +49,7 @@ class Address {
   }
 
   async validateWeather(req) {
-    return this.retrieveTheWeather(req);
+    return this.retrieveTheWeather(req.body);
   }
 
   mapGeocodingObject(geocodingData, user = '') {
@@ -67,7 +67,9 @@ class Address {
       geometry: geocodingData.geometry,
       placeId: geocodingData.place_id,
       expire: expire,
-      user: user
+      userToken: user.accessToken,
+      user: user.id,
+      notification: user.notification
     };
   }
 
@@ -77,9 +79,9 @@ class Address {
 
   async retriveInfoRelatedAddress(req) {
     const currentAddress = await this.getAddress(req);
-    if (this.validateAddress(currentAddress)) {
+    if (this.isValidAddress(currentAddress)) {
       const responseData = currentAddress.data.results.shift();
-      const documentCreated = await saveAddressToDB(this.mapGeocodingObject(responseData, req.user.accessToken));
+      const documentCreated = await saveAddressToDB(this.mapGeocodingObject(responseData, req.user));
       const weather = await this.weatherModel.request({q: this.mapQueryWeather(documentCreated)});
       return Object.assign({}, documentCreated._doc, {weather: weather.data});
     } else {
@@ -122,7 +124,7 @@ class Address {
   }
 
   isValidAddress({status, statusText, data}) {
-    return status === 200 && statusText === 'OK' && data.status !== 'OK';
+    return status === 200 && statusText === 'OK' && data.status === 'OK';
   }
 
   mapQueryWeather(body) {

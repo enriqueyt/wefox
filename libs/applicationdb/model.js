@@ -9,6 +9,10 @@ class ModelDb {
     return this.Model.create(newRegister);
   }
 
+  async findPopulate(options = {}, model) {
+    return this.Model.find(options).populate(model).lean().exec();
+  }
+
   async findOne(options = {}) {
     return this.Model.findOne(options).lean().exec();
   }

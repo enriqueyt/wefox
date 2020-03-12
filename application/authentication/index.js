@@ -25,7 +25,10 @@ class Auth {
 
   async validate(token, done) {
     const data = await this.authModel.getToken(token);
-    return done(null, data);
+    const {name, email, postalCode, country, notification} = await this.modelUser.findUserById(data.id);
+    return done(null, Object.assign({},
+      {name: name, email: email, postalCode: postalCode, country: country, notification: notification},
+      {accessToken: data.accessToken, id: data.id}));
   }
 }
 

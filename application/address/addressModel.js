@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const schema = mongoose.Schema;
 
 const addressModel = new mongoose.Schema({
   street: String,
@@ -11,7 +12,12 @@ const addressModel = new mongoose.Schema({
   geometry: Array,
   placeId: String,
   expire: Number,
-  user: String
+  userToken: String,
+  notification: Boolean,
+  user: {
+    type: schema.Types.ObjectId,
+    ref: 'user'
+  }
 });
 
 module.exports.addressModel = mongoose.model('address', addressModel);

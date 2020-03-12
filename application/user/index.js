@@ -11,15 +11,15 @@ class User {
     return new User(dbInstanse);
   }
 
-  async createUser(req, res) {
-    const newPassword = await this.encryptPassword(req.body.password);
-    const document = Object.assign({}, req.body, {password: newPassword});
+  async createUser(req) {
+    const newPassword = await this.encryptPassword(req.password);
+    const document = Object.assign({}, req, {password: newPassword});
     const userModel = this.mapUserModel(document);
     return this.model.create(userModel);
   }
 
-  async findUserById(req, res) {
-    return this.model.findOne({_id: req.body.id});
+  async findUserById(id) {
+    return this.model.findOne({_id: id});
   }
 
   async findUserByUsername(username) {
@@ -47,19 +47,21 @@ class User {
       return null;
     }
 
-    const {name, email, postalCode, country} = response;
+    const {name, email, postalCode, country, notification, _id} = response;
 
     return {
+      _id: _id.toString(),
       name,
       username,
       email,
       postalCode,
-      country
+      country,
+      notification
     };
   }
 
   mapUserModel(currentDocument, updatedProperties = {}) {
-    const {name, username, password, email, postalCode, country} = currentDocument;
+    const {name, username, password, email, postalCode, country, notification} = currentDocument;
 
     return Object.assign({}, {
       name: name,
@@ -67,7 +69,8 @@ class User {
       password: password,
       email: email,
       postalCode: postalCode,
-      country: country
+      country: country,
+      notification: notification
     }, updatedProperties);
   }
 }
