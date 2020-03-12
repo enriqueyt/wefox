@@ -1,7 +1,7 @@
 const expect = require('chai').expect;
 const {User} = require('../../../application/user');
 
-describe('CRUD for User Model in database', () => {
+describe.skip('CRUD for User Model in database', () => {
   before('global stub', () => {
     this.newInstanseDb = null;
   });

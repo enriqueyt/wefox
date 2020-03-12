@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node application/",
+    "start": "npm run notifications:start; node application/",
+    "stop": "npm run notifications:stop",
+    "notifications:start": "bash scripts/notifications.sh start > /dev/null 2>/dev/null &",
+    "notifications:stop": "bash scripts/notifications.sh stop > /dev/null 2>/dev/null &",
     "lint": "node_modules/.bin/eslint .",
     "test": "mocha $NODE_DEBUG_OPTION test/**/*.spec.js"
   },

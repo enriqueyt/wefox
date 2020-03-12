@@ -6,7 +6,7 @@ const {server} = require('../server-setup');
 
 const authenticatedUser = request.agent(server);
 
-describe('Handler CRUD for address db modelapplication db', () => {
+describe.skip('Handler CRUD for address db modelapplication db', () => {
   before('global stub', () => {
     const weatherStub = {
       coord: {
@@ -58,7 +58,7 @@ describe('Handler CRUD for address db modelapplication db', () => {
 
   });
 
-  describe.skip('process to user the library in the application', () => {
+  describe('process to user the library in the application', () => {
     before('instanciate db application', async() => {
 
     });
