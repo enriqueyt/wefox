@@ -16,7 +16,8 @@ const user = new mongoose.Schema({
     type: String
   },
   postalCode: String,
-  country: String
+  country: String,
+  notification: Boolean
 });
 
 module.exports.userModel = mongoose.model('user', user);

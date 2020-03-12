@@ -10,24 +10,24 @@ router.get('/api/address/validate', passport.authenticate('bearer', {session: fa
   if (!req.user) {
     res.status(400).send(req.error);
   }
-  const aux = await Address.validate(req);
-  res.status(200).send(aux);
+  const validateAddress = await Address.validate(req);
+  res.status(200).send(validateAddress);
 });
 
-router.get('/api/address', passport.authenticate('bearer', {session: false}), async(req, res, next) => {
+router.post('/api/address', passport.authenticate('bearer', {session: false}), async(req, res, next) => {
   if (!req.user) {
     res.status(400).send(req.error);
   }
-  const aux = await Address.validateAddressWeather(req);
-  res.status(200).send(aux);
+  const addressWeather = await Address.validateAddressWeather(req);
+  res.status(200).json(addressWeather);
 });
 
-router.get('/api/weather', passport.authenticate('bearer', {session: false}), async(req, res, next) => {
+router.post('/api/weather', passport.authenticate('bearer', {session: false}), async(req, res, next) => {
   if (!req.user) {
     res.status(400).send(req.error);
   }
-  const aux = await Address.validateWeather(req);
-  res.status(200).send(aux);
+  const weather = await Address.validateWeather(req);
+  res.status(200).json(weather);
 });
 
 module.exports = router;

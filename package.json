@@ -29,6 +29,7 @@
     "express-session": "^1.17.0",
     "moment": "^2.24.0",
     "mongoose": "^5.9.3",
+    "nodemailer": "^6.4.5",
     "oauth2-server": "^3.0.1",
     "passport": "^0.4.1",
     "passport-http-bearer": "^1.0.1",
