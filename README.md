@@ -77,14 +77,14 @@ data
 ### Validate address
 
 ```
-POST http://localhost:3000/api/address
+GET http://localhost:3000/api/address
 --header Authorization: Bearer c11bb2f946645e22a2f0c171fee43ddd77067901
 
-data
+queryString
 
 {
 	"address": "Fellows Ct",
-    "country": "uk",
+    "country": "gb",
     "town": "london",
     "postalCode": "E2",
     "streetNumber": "Fellows"
@@ -95,14 +95,14 @@ data
 ### Validate weather
 
 ```
-POST http://localhost:3000/api/weather
+GET http://localhost:3000/api/weather
 --header Authorization: Bearer c11bb2f946645e22a2f0c171fee43ddd77067901
 
-data
+queryString
 
 {
 	"address": "Fellows Ct",
-    "country": "uk",
+    "country": "gb",
     "town": "london",
     "postalCode": "E2",
     "streetNumber": "Fellows"

@@ -1,3 +1,4 @@
+const createError = require('http-errors');
 const {AuthModel} = require('./authModel');
 const {User} = require('../user');
 
@@ -19,12 +20,15 @@ class Auth {
       const token = await this.authModel.saveToken(response);
       return done(null, token);
     } else {
-      return done(new Error('Wrong User or Password'));
+      return done(createError(401, 'Wrong User or Password'));
     }
   }
 
   async validate(token, done) {
     const data = await this.authModel.getToken(token);
+    if (!data.id) {
+      return done(createError(400, data), null);
+    }
     const {name, email, postalCode, country, notification} = await this.modelUser.findUserById(data.id);
     return done(null, Object.assign({},
       {name: name, email: email, postalCode: postalCode, country: country, notification: notification},

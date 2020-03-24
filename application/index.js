@@ -11,6 +11,7 @@ const errorHandler = require('../libs/api-error-handler');
 
 const router = require('./router');
 const addressRouter = require('./address/router');
+const authRouter = require('./authentication/router');
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 
 app.use(router);
 app.use(addressRouter);
+app.use(authRouter);
 app.use(errorHandler());
 
 if (require.main === module) {

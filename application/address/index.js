@@ -6,15 +6,33 @@ const capitalize = (string) => {
   return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
-const findAddressInDB = async({address, town, postalCode, country}) => {
+const clearQueryObject = ({address, town, postalCode, country}) => {
+  const obj = {};
+  const ROW = {
+    STREET: 'street',
+    TOWN: 'street',
+    POSTAL_CODE: 'street',
+    COUNTRY: 'street'
+  };
+  if (address) {
+    obj[ROW.STREET] = capitalize(address);
+  }
+  if (town) {
+    obj[ROW.TOWN] = capitalize(town);
+  }
+  if (postalCode) {
+    obj[ROW.POSTAL_CODE] = postalCode;
+  }
+  if (country) {
+    obj[ROW.COUNTRY] = capitalize(country);
+  }
+  return obj;
+};
+
+const findAddressInDB = async(paramObj) => {
   const dbInstanse = await db();
   const addressModel = dbInstanse.get('address');
-  return addressModel.findOne({
-    street: capitalize(address),
-    town: capitalize(town),
-    postalCode: postalCode,
-    country: country.toUpperCase()
-  });
+  return addressModel.find(clearQueryObject(paramObj));
 };
 
 const saveAddressToDB = async(document) => {
@@ -49,13 +67,12 @@ class Address {
   }
 
   async validateWeather(req) {
-    return this.retrieveTheWeather(req.body);
+    return this.retrieveTheWeather(this.parseQueryRequest(req));
   }
 
   mapGeocodingObject(geocodingData, user = '') {
     const expire = moment().utc().add({hours: 12}).unix();
-    const [street, _town, country] = geocodingData.formatted_address.split(',');
-    const [town, postalCode] = _town.trim().split(' ');
+    const [street, town, postalCode, country] = geocodingData.formatted_address.split(',');
     return {
       street: street,
       formattedAddress: geocodingData.formatted_address,
@@ -80,13 +97,26 @@ class Address {
   async retriveInfoRelatedAddress(req) {
     const currentAddress = await this.getAddress(req);
     if (this.isValidAddress(currentAddress)) {
-      const responseData = currentAddress.data.results.shift();
-      const documentCreated = await saveAddressToDB(this.mapGeocodingObject(responseData, req.user));
-      const weather = await this.weatherModel.request({q: this.mapQueryWeather(documentCreated)});
-      return Object.assign({}, documentCreated._doc, {weather: weather.data});
+      const result = await this.processDataFromGoecoding(currentAddress.data.results, req.user);
+      return result;
     } else {
-      throw new Error('Invalid address');
+      throw new Error(currentAddress.data.status);
     }
+  }
+
+  async processDataFromGoecoding(arrAddress, user) {
+    const result = [];
+    let weather;
+    for (let i = 0; i < arrAddress.length; i++) {
+      const documentCreated = await saveAddressToDB(this.mapGeocodingObject(arrAddress[i], user));
+      try {
+        weather = await this.weatherModel.request({q: this.mapQueryWeather(documentCreated)});
+      } catch (e) {
+        weather.data = new Error(e);
+      }
+      result.push(Object.assign({}, documentCreated._doc, {weather: weather.data}));
+    }
+    return result;
   }
 
   async retrieveTheWeather(data) {
@@ -94,32 +124,55 @@ class Address {
   }
 
   async validateAddressWeather(req) {
-    const result = await findAddressInDB(req.body);
+    const result = await findAddressInDB(this.parseQueryRequest(req));
     if (result) {
-      if (!this.itHasExpired(result)) {
-        const weather = await this.retrieveTheWeather(result);
-        return Object.assign({}, result, {weather: weather.data});
-      } else {
-        await deleteAddressToDB(result._id);
-        return this.retriveInfoRelatedAddress(req);
-      }
+      return this.arrangementDataFromDB(result, req);
     } else {
       return this.retriveInfoRelatedAddress(req);
     }
   }
 
+  async arrangementDataFromDB(arrData, req) {
+    const result = [];
+    let weather;
+    for (let i = 0; i < arrData.length; i++) {
+      if (!this.itHasExpired(arrData[i])) {
+        try {
+          weather = await this.retrieveTheWeather(arrData[i]);
+        } catch (e) {
+          weather.data = new Error(e);
+        }
+        result.push(Object.assign({}, result, {weather: weather.data}));
+      } else {
+        await deleteAddressToDB(result._id);
+        result.push(this.retriveInfoRelatedAddress(arrData[i], req));
+      }
+    }
+
+    return result;
+  }
+
   rowToVolunteer(row) {
-    return {
-      address: row.address,
-      postal_code: row.postalCode,
-      country: row.country,
-      postal_town: row.town,
-      route: row.streetNumber
+    const map = {};
+    const ROW = {
+      address: 'address',
+      postalCode: 'postal_code',
+      country: 'country',
+      town: 'postal_town',
+      route: 'streetNumber'
     };
+
+    for (const i in row) {
+      if (row[i]) {
+        map[ROW[i]] = row[i];
+      }
+    }
+
+    return map;
   }
 
   async getAddress(req) {
-    const data = this.mapQueryComponents(this.rowToVolunteer(req.body));
+    const data = this.mapQueryComponents(this.rowToVolunteer(this.parseQueryRequest(req)));
     return this.goecodingModel.request(data);
   }
 
@@ -154,6 +207,16 @@ class Address {
       address: body.address,
       components: options
     };
+  }
+
+  parseQueryRequest(req) {
+    return Object.assign({}, {
+      address: req.query.address,
+      country: req.query.country,
+      town: req.query.town,
+      postalCode: req.query.postalCode,
+      streetNumber: req.query.streetNumber
+    });
   }
 }
 

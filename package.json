@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npm run notifications:start; node application/",
+    "start": "node application/",
     "stop": "npm run notifications:stop",
     "notifications:start": "bash scripts/notifications.sh start > /dev/null 2>/dev/null &",
     "notifications:stop": "bash scripts/notifications.sh stop > /dev/null 2>/dev/null &",
@@ -29,7 +29,9 @@
     "csrf": "^3.1.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "express-promise-wrap": "^0.2.2",
     "express-session": "^1.17.0",
+    "http-errors": "^1.7.3",
     "moment": "^2.24.0",
     "mongoose": "^5.9.3",
     "nodemailer": "^6.4.5",

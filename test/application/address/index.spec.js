@@ -67,7 +67,7 @@ describe('Handler CRUD for address db modelapplication db', () => {
       this.initStub.restore();
     });
 
-    it('new address has to be inserted', async() => {
+    it.skip('new address has to be inserted', async() => {
       const aux = {
         addressComponents: [
           {
@@ -217,25 +217,21 @@ describe('Handler CRUD for address db modelapplication db', () => {
     });
   });
 
-  describe.skip('/api/address/validate', () => {
+  describe('/api/address/validate', () => {
     const req = {
-      body: {
-        address: 'Fellows Ct',
-        country: 'uk',
-        town: 'london',
-        postalCode: 'E2',
-        streetNumber: 'Fellows'
-      }
+      address: 'Fellows Ct',
+      country: 'uk',
+      town: 'london',
+      postalCode: 'E2',
+      streetNumber: 'Fellows'
     };
 
     it.skip('should validate and address given', () => {
       authenticatedUser
         .get('/api/address/validate')
-        .send(req)
+        .query(req)
         .set({
-          Authorization: 'Bearer xf8rvp57YnAwr7LHE1lI6eB9845M2yuvaGVby2AyXkYcaAB4pHawHVD8mx7HlgTT9AVQoSUTasxfq0' +
-            'M8pkGsfBo97pvBmWG6EqPieVkQhCRnr3ih50CZLI1PxV1jHo3nrRI1SYc4bd4kodxYx4HwVbMwAS6cluyvn1Zc1LUceW8E9lnfE7GFV' +
-            'jzvP14a7jqcojBDET8NvAWpGAy9x2uYO51GHcnLSwEUUP2OGuun5ae34qWoEtvQrpxAkY2VnPQB'
+          Authorization: 'Bearer 3f4aedb39a992484c058d334a7784de8fc1c9ff5'
         })
         .end((err, response) => {
           if (err) {
@@ -248,11 +244,9 @@ describe('Handler CRUD for address db modelapplication db', () => {
     it.skip('should retrieve infor for the weather', () => {
       authenticatedUser
         .get('/api/weather')
-        .send(req)
+        .query(req)
         .set({
-          Authorization: 'Bearer xf8rvp57YnAwr7LHE1lI6eB9845M2yuvaGVby2AyXkYcaAB4pHawHVD8mx7HlgTT9AVQoSUTasxfq0' +
-            'M8pkGsfBo97pvBmWG6EqPieVkQhCRnr3ih50CZLI1PxV1jHo3nrRI1SYc4bd4kodxYx4HwVbMwAS6cluyvn1Zc1LUceW8E9lnfE7GFV' +
-            'jzvP14a7jqcojBDET8NvAWpGAy9x2uYO51GHcnLSwEUUP2OGuun5ae34qWoEtvQrpxAkY2VnPQB'
+          Authorization: 'Bearer 3f4aedb39a992484c058d334a7784de8fc1c9ff5'
         })
         .end((err, response) => {
           if (err) {
@@ -265,11 +259,9 @@ describe('Handler CRUD for address db modelapplication db', () => {
     it.skip('should retrieve info the address and the weather', () => {
       authenticatedUser
         .get('/api/address')
-        .send(req.body)
+        .query(req)
         .set({
-          Authorization: 'Bearer xf8rvp57YnAwr7LHE1lI6eB9845M2yuvaGVby2AyXkYcaAB4pHawHVD8mx7HlgTT9AVQoSUTasxfq0' +
-            'M8pkGsfBo97pvBmWG6EqPieVkQhCRnr3ih50CZLI1PxV1jHo3nrRI1SYc4bd4kodxYx4HwVbMwAS6cluyvn1Zc1LUceW8E9lnfE7GFV' +
-            'jzvP14a7jqcojBDET8NvAWpGAy9x2uYO51GHcnLSwEUUP2OGuun5ae34qWoEtvQrpxAkY2VnPQB'
+          Authorization: 'Bearer 3f4aedb39a992484c058d334a7784de8fc1c9ff5'
         })
         .end((err, response) => {
           if (err) {

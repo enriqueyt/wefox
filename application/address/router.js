@@ -1,33 +1,19 @@
 const router = require('express').Router({});
+const {wrap} = require('express-promise-wrap');
 const passport = require('passport');
-const {Address} = require('./');
+const {handleAddressValidation, handleAddressWeatherValidation, handleWeatherValidation} = require('./handler');
 
 router.get('/address', function(req, res) {
   res.status(200).send('Address');
 });
 
-router.get('/api/address/validate', passport.authenticate('bearer', {session: false}), async(req, res, next) => {
-  if (!req.user) {
-    res.status(400).send(req.error);
-  }
-  const validateAddress = await Address.validate(req);
-  res.status(200).send(validateAddress);
-});
+router.get('/api/address/validate',
+  passport.authenticate('bearer', {session: false}), wrap(handleAddressValidation));
 
-router.post('/api/address', passport.authenticate('bearer', {session: false}), async(req, res, next) => {
-  if (!req.user) {
-    res.status(400).send(req.error);
-  }
-  const addressWeather = await Address.validateAddressWeather(req);
-  res.status(200).json(addressWeather);
-});
+router.get('/api/address',
+  passport.authenticate('bearer', {session: false}), wrap(handleAddressWeatherValidation));
 
-router.post('/api/weather', passport.authenticate('bearer', {session: false}), async(req, res, next) => {
-  if (!req.user) {
-    res.status(400).send(req.error);
-  }
-  const weather = await Address.validateWeather(req);
-  res.status(200).json(weather);
-});
+router.get('/api/weather',
+  passport.authenticate('bearer', {session: false}), wrap(handleWeatherValidation));
 
 module.exports = router;

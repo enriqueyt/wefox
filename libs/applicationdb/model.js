@@ -17,6 +17,10 @@ class ModelDb {
     return this.Model.findOne(options).lean().exec();
   }
 
+  async find(options = {}) {
+    return this.Model.find(options).lean().exec();
+  }
+
   async updateOne(id, options) {
     return this.Model.findOneAndUpdate({
       _id: id
